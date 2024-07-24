@@ -1,8 +1,7 @@
 let minSize = 2; // Minimum size of the box
 let maxSize = 250; // Maximum size of the box
 
-let palette = [];
-
+let palette = ["#EC4300", "#007A59", "#2A64AF", "#8A7752"];
 let colors = [];
 
 const PARAMS = {
@@ -10,10 +9,6 @@ const PARAMS = {
   boxDepth: 1,
   minScale: 2,
   maxScale: 250,
-  boxColor1: "#EC4300",
-  boxColor2: "#007A59",
-  boxColor3: "#2A64AF",
-  boxColor4: "#8A7752",
   boxSpacing: 250,
   boxAmount: 2
 };
@@ -21,7 +16,7 @@ const PARAMS = {
 const pane = new Tweakpane.Pane();
 
 function setup() { 
-  createCanvas(800, 800, WEBGL);
+  createCanvas(1500, 800, WEBGL);
   noStroke();
   rectMode(CENTER);
 
@@ -46,53 +41,20 @@ function setup() {
     max: 300
   });
 
-  pane.addInput(PARAMS, "boxColor1", {
-    view: "color",
-  });
-
-  pane.addInput(PARAMS, "boxColor2", {
-    view: "color",
-  });
-
-  pane.addInput(PARAMS, "boxColor3", {
-    view: "color",
-  });
-
-  pane.addInput(PARAMS, "boxColor4", {
-    view: "color",
-  });
-
   pane.addInput(PARAMS, "boxSpacing", {
     min: 10,
     max: 800
   });
 
-  // Initialize palette
-  updatePalette();
-
-  // Redraw on change
-  pane.on("change", function (ev) {
-    updatePalette();
-    updateColors();
-    redraw();
-  });
-
   // Initialize colors
-  updateColors();
+  initializeColors();
 }
 
-function updatePalette() {
-  palette[0] = PARAMS.boxColor1;
-  palette[1] = PARAMS.boxColor2;
-  palette[2] = PARAMS.boxColor3;
-  palette[3] = PARAMS.boxColor4;
-}
-
-function updateColors() {
+function initializeColors() {
   for (var y = -2; y <= 2; y++) {
     colors[y + 2] = [];
-    for (var x = -2; x <= 2; x++) {
-      colors[y + 2][x + 2] = random(palette);
+    for (var x = -4; x <= 4; x++) { // Adjusted for 9 columns
+      colors[y + 2][x + 4] = random(palette);
     }
   }
 }
@@ -106,14 +68,16 @@ function draw() {
   let z = 2;
 
   for (var y = -2; y <= 2; y++) {
-    for (var x = -2; x <= 2; x++) {
+    for (var x = -4; x <= 4; x++) { // Adjusted for 9 columns
+      let color = colors[y + 2][x + 4];
+      
       // Adjust the noise parameters to ensure each cube has a unique scale
       let n = noise(x * 0.2 + frameCount * 0.001, y * 0.2 + frameCount * 0.001, z * 0.2);
       // Map the noise value to the desired size range
       let boxSize = map(n, 0, 1, PARAMS.minScale, PARAMS.maxScale);
 
       push();
-      fill(colors[y + 2][x + 2]);
+      fill(color);
       translate(PARAMS.boxSpacing * x, PARAMS.boxSpacing * y, -PARAMS.boxSpacing * z);
       rotateX(frameCount * 0.002);
       rotateY(x * frameCount * 0.002);
